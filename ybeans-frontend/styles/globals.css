@@ -1,0 +1,15 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+body {
+  font-family: 'Arial', sans-serif;
+}
+
+.bg-brown-600 {
+  background-color: #795548;
+}
+
+.hover\:bg-brown-700:hover {
+  background-color: #5D4037;
+}
