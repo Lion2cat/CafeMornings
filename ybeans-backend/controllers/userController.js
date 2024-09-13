@@ -39,18 +39,21 @@ const registerUser = async (req, res) => {
 // @route   POST /api/users/login
 // @access  Public
 const authUser = async (req, res) => {
-  const { email, phone, password } = req.body;
-  
-  const login = email || phone;
+  const { email, phone, username, password } = req.body;
 
-  if (!login || !password) {
+  let query = {};
+  if (email) query.email = email;
+  else if (phone) query.phone = phone;
+  else if (username) query.username = username;
+  else {
     res.status(400);
-    throw new Error('Please provide both email/phone and password');
+    throw new Error('Please provide email, phone, or username');
   }
 
-  // Check if login is email or phone
-  const isEmail = login.includes('@');
-  const query = isEmail ? { email: login } : { phone: login };
+  if (!password) {
+    res.status(400);
+    throw new Error('Please provide password');
+  }
 
   const user = await User.findOne(query);
 
@@ -60,13 +63,44 @@ const authUser = async (req, res) => {
       username: user.username,
       email: user.email,
       phone: user.phone,
-      isAdmin: user.isAdmin, // 添加这行以返回用户的管理员状态
+      isAdmin: user.isAdmin,
       token: generateToken(user._id),
     });
   } else {
     res.status(401);
-    throw new Error('Invalid email/phone or password');
+    throw new Error('Invalid credentials');
   }
 };
 
-module.exports = { registerUser, authUser };
+// Get all users (admin only)
+const getUsers = async (req, res) => {
+  try {
+    const users = await User.find({}).select('-password');
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+// Update user role (admin only)
+const updateUserRole = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (user) {
+      user.isAdmin = req.body.isAdmin;
+      const updatedUser = await user.save();
+      res.json({
+        _id: updatedUser._id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        isAdmin: updatedUser.isAdmin,
+      });
+    } else {
+      res.status(404).json({ message: 'User not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+module.exports = { registerUser, authUser, getUsers, updateUserRole };

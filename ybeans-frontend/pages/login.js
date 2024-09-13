@@ -8,7 +8,8 @@ const LoginPage = () => {
   const router = useRouter();
   const { setUser } = useContext(AuthContext);
   const [formData, setFormData] = useState({
-    email: '', // 或者使用 phone
+    loginType: 'email', // 默认使用邮箱登录
+    loginValue: '',
     password: '',
   });
 
@@ -20,7 +21,11 @@ const LoginPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const userData = await login(formData);
+      const loginData = {
+        [formData.loginType]: formData.loginValue,
+        password: formData.password,
+      };
+      const userData = await login(loginData);
       setUser(userData);
       if (userData.isAdmin) {
         router.push('/admin/dashboard');
@@ -37,12 +42,28 @@ const LoginPage = () => {
       <h1 className="text-3xl font-bold my-8">Login</h1>
       <form onSubmit={handleSubmit} className="max-w-md mx-auto">
         <div className="mb-4">
-          <label htmlFor="email" className="block mb-2">Email</label>
+          <label htmlFor="loginType" className="block mb-2">Login Method</label>
+          <select
+            id="loginType"
+            name="loginType"
+            value={formData.loginType}
+            onChange={handleChange}
+            className="w-full px-3 py-2 border rounded-lg"
+          >
+            <option value="email">Email</option>
+            <option value="phone">Phone</option>
+            <option value="username">Username</option>
+          </select>
+        </div>
+        <div className="mb-4">
+          <label htmlFor="loginValue" className="block mb-2">
+            {formData.loginType === 'email' ? 'Email' : formData.loginType === 'phone' ? 'Phone' : 'Username'}
+          </label>
           <input
-            type="email"
-            id="email"
-            name="email"
-            value={formData.email}
+            type={formData.loginType === 'email' ? 'email' : 'text'}
+            id="loginValue"
+            name="loginValue"
+            value={formData.loginValue}
             onChange={handleChange}
             required
             className="w-full px-3 py-2 border rounded-lg"

@@ -69,5 +69,4 @@ const updateProduct = async (req, res) => {
     throw new Error('Product not found');
   }
 };
-
 module.exports = { getProducts, getProductById, createProduct, updateProduct };

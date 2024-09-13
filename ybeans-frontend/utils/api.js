@@ -75,16 +75,19 @@ export const register = async (userData) => {
 };
 
 export const login = async (credentials) => {
-  const response = await fetch(`${API_URL}/users/login`, { // 移除 /api
+  const response = await fetch(`${API_URL}/users/login`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(credentials),
   });
+
   if (!response.ok) {
-    throw new Error('Login failed');
+    const error = await response.json();
+    throw new Error(error.message || 'Login failed');
   }
+
   return response.json();
 };
 
@@ -98,7 +101,77 @@ export async function addProduct(productData) {
     body: JSON.stringify(productData),
   });
   if (!response.ok) {
-    throw new Error('Failed to add product');
+    const error = await response.json();
+    throw new Error(error.message || 'Failed to add product');
   }
   return response.json();
 }
+
+export const getProducts = async () => {
+  const response = await fetch(`${API_URL}/products`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch products');
+  }
+  return response.json();
+};
+
+export const deleteProduct = async (id) => {
+  const response = await fetch(`${API_URL}/products/${id}`, {
+    method: 'DELETE',
+    headers: getAuthHeader(),
+  });
+  if (!response.ok) {
+    throw new Error('Failed to delete product');
+  }
+  return response.json();
+};
+
+export const getOrders = async () => {
+  const response = await fetch(`${API_URL}/orders`, {
+    headers: getAuthHeader(),
+  });
+  if (!response.ok) {
+    throw new Error('Failed to fetch orders');
+  }
+  return response.json();
+};
+
+export const updateOrderStatus = async (id, status) => {
+  const response = await fetch(`${API_URL}/orders/${id}/status`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      ...getAuthHeader(),
+    },
+    body: JSON.stringify({ status }),
+  });
+  if (!response.ok) {
+    throw new Error('Failed to update order status');
+  }
+  return response.json();
+};
+
+export const getUsers = async () => {
+  const response = await fetch(`${API_URL}/users`, {
+    headers: getAuthHeader(),
+  });
+  if (!response.ok) {
+    throw new Error('Failed to fetch users');
+  }
+  return response.json();
+};
+
+export const updateUserRole = async (id, isAdmin) => {
+  const response = await fetch(`${API_URL}/users/${id}/role`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      ...getAuthHeader(),
+    },
+    body: JSON.stringify({ isAdmin }),
+  });
+  if (!response.ok) {
+    throw new Error('Failed to update user role');
+  }
+  return response.json();
+};

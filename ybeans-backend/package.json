@@ -5,7 +5,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js",
-    "create-admin": "node createAdminUser.js"
+    "create-admin": "node createAdminUser.js",
+    "list-users": "node listUsers.js"
   },
   "keywords": [],
   "author": "",
