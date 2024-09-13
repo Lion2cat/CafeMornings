@@ -23,6 +23,11 @@ const userSchema = mongoose.Schema(
       required: true,
     },
     address: String,
+    isAdmin: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
   },
   {
     timestamps: true,

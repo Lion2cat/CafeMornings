@@ -25,7 +25,20 @@ const getProductById = async (req, res) => {
 // @route   POST /api/products
 // @access  Private/Admin
 const createProduct = async (req, res) => {
-  const product = new Product(req.body);
+  const { name, description, price, stock, category, origin, roastLevel, flavorNotes, imageUrl } = req.body;
+
+  const product = new Product({
+    name,
+    description,
+    price,
+    stock,
+    category,
+    origin,
+    roastLevel,
+    flavorNotes,
+    imageUrl
+  });
+
   const createdProduct = await product.save();
   res.status(201).json(createdProduct);
 };

@@ -11,10 +11,10 @@ const Navbar = () => {
           </Link>
           <div className="flex space-x-4">
             <Link href="/products" className="hover:text-gray-300">
-              <span>Products</span>
+              Products
             </Link>
             <Link href="/cart" className="hover:text-gray-300">
-              <span>Cart</span>
+              Cart
             </Link>
           </div>
         </div>

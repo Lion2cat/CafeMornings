@@ -45,10 +45,8 @@ const CartPage = () => {
           </ul>
           <div className="mt-8 flex justify-between items-center">
             <p className="text-xl font-semibold">Total: ${total.toFixed(2)}</p>
-            <Link href="/checkout">
-              <a className="bg-brown-600 text-white px-6 py-3 rounded-lg hover:bg-brown-700 transition duration-300">
-                Proceed to Checkout
-              </a>
+            <Link href="/checkout" className="bg-brown-600 text-white px-6 py-3 rounded-lg hover:bg-brown-700 transition duration-300">
+              Proceed to Checkout
             </Link>
           </div>
         </>
