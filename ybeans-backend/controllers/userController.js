@@ -39,7 +39,14 @@ const registerUser = async (req, res) => {
 // @route   POST /api/users/login
 // @access  Public
 const authUser = async (req, res) => {
-  const { login, password } = req.body;
+  const { email, phone, password } = req.body;
+  
+  const login = email || phone;
+
+  if (!login || !password) {
+    res.status(400);
+    throw new Error('Please provide both email/phone and password');
+  }
 
   // Check if login is email or phone
   const isEmail = login.includes('@');
@@ -53,6 +60,7 @@ const authUser = async (req, res) => {
       username: user.username,
       email: user.email,
       phone: user.phone,
+      isAdmin: user.isAdmin, // 添加这行以返回用户的管理员状态
       token: generateToken(user._id),
     });
   } else {
