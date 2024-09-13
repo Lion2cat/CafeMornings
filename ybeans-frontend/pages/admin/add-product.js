@@ -16,7 +16,7 @@ const AddProductPage = () => {
     origin: '',
     roastLevel: '',
     flavorNotes: '',
-    imageUrl: '',
+    imageUrl: null,
   });
 
   useEffect(() => {
@@ -26,8 +26,12 @@ const AddProductPage = () => {
   }, [user, router]);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({ ...prevData, [name]: value }));
+    const { name, value, files } = e.target;
+    if (name === 'image') {
+      setFormData((prevData) => ({ ...prevData, [name]: files[0] }));
+    } else {
+      setFormData((prevData) => ({ ...prevData, [name]: value }));
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -145,12 +149,11 @@ const AddProductPage = () => {
           />
         </div>
         <div className="mb-4">
-          <label htmlFor="imageUrl" className="block mb-2">Image URL</label>
+          <label htmlFor="image" className="block mb-2">Product Image</label>
           <input
-            type="text"
-            id="imageUrl"
-            name="imageUrl"
-            value={formData.imageUrl}
+            type="file"
+            id="image"
+            name="image"
             onChange={handleChange}
             required
             className="w-full px-3 py-2 border rounded-lg"

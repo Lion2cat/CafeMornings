@@ -11,7 +11,7 @@ const CartPage = () => {
   useEffect(() => {
     getCart()
       .then((data) => {
-        setCartItems(data);
+        setCartItems(data.items || []);
         setLoading(false);
       })
       .catch((err) => {
@@ -20,7 +20,9 @@ const CartPage = () => {
       });
   }, []);
 
-  const total = cartItems.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
+  const total = Array.isArray(cartItems) 
+    ? cartItems.reduce((sum, item) => sum + item.product.price * item.quantity, 0)
+    : 0;
 
   if (loading) return <Layout><p>Loading...</p></Layout>;
   if (error) return <Layout><p>Error: {error}</p></Layout>;

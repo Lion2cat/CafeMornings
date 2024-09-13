@@ -1,6 +1,7 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 
-const getAuthHeader = () => {
+// 确保这个函数被定义并导出
+export const getAuthHeader = () => {
   const user = JSON.parse(localStorage.getItem('user'));
   return user ? { 'Authorization': `Bearer ${user.token}` } : {};
 };
@@ -92,14 +93,21 @@ export const login = async (credentials) => {
 };
 
 export async function addProduct(productData) {
+  const formData = new FormData();
+  for (const key in productData) {
+    if (key === 'image' && productData[key] instanceof File) {
+      formData.append('image', productData[key]);
+    } else {
+      formData.append(key, productData[key]);
+    }
+  }
+
   const response = await fetch(`${API_URL}/products`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      ...getAuthHeader(),
-    },
-    body: JSON.stringify(productData),
+    headers: getAuthHeader(),
+    body: formData,
   });
+
   if (!response.ok) {
     const error = await response.json();
     throw new Error(error.message || 'Failed to add product');
@@ -116,12 +124,33 @@ export const getProducts = async () => {
 };
 
 export const deleteProduct = async (id) => {
+  console.log('Attempting to delete product with id:', id);
+  console.log('Auth header:', getAuthHeader());
   const response = await fetch(`${API_URL}/products/${id}`, {
     method: 'DELETE',
     headers: getAuthHeader(),
   });
+  const responseData = await response.json();
+  console.log('Delete product response:', response.status, responseData);
   if (!response.ok) {
-    throw new Error('Failed to delete product');
+    console.error('Delete product error:', responseData);
+    throw new Error(responseData.message || 'Failed to delete product');
+  }
+  return responseData;
+};
+
+export const updateProduct = async (id, productData) => {
+  const response = await fetch(`${API_URL}/products/${id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      ...getAuthHeader(),
+    },
+    body: JSON.stringify(productData),
+  });
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || 'Failed to update product');
   }
   return response.json();
 };
