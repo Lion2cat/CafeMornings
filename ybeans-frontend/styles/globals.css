@@ -13,3 +13,54 @@ body {
 .hover\:bg-brown-700:hover {
   background-color: #5D4037;
 }
+
+.grid-animation {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.square {
+  width: 80px;
+  height: 80px;
+  background-color: #FFD700;
+  transition: transform 0.3s ease;
+}
+
+.square:hover {
+  transform: rotate(10deg);
+}
+
+.falling-square {
+  animation: fall 2s forwards, rotate 2s linear infinite;
+}
+
+.coffee-bean {
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  background-image: url('/images/coffee-bean.svg');
+  background-size: cover;
+  opacity: 0;
+  animation: appear 0.5s 2s forwards, bounce 0.5s 2s ease-out;
+}
+
+@keyframes fall {
+  0% { transform: translateY(0) rotate(0deg); }
+  100% { transform: translateY(200%) rotate(360deg); opacity: 0; }
+}
+
+@keyframes rotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes appear {
+  0% { opacity: 0; transform: scale(0); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-20px); }
+}

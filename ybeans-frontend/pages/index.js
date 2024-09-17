@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Layout from '../components/Layout';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -8,6 +8,14 @@ const Home = () => {
   const sectionRefs = useRef([]);
   const { scrollYProgress } = useScroll();
   const yBeans = useTransform(scrollYProgress, [0, 1], [0, 100]);
+  const [isAnimating, setIsAnimating] = useState(false);
+
+  const startAnimation = () => {
+    if (!isAnimating) {
+      setIsAnimating(true);
+      setTimeout(() => setIsAnimating(false), 3000); // 动画持续3秒
+    }
+  };
 
   useEffect(() => {
     const observerOptions = {
@@ -49,6 +57,19 @@ const Home = () => {
             y: yBeans
           }}
         />
+
+        <section className="brand-animation py-20 bg-coffee-light relative overflow-hidden">
+          <div className="container mx-auto px-4">
+            <h2 className="text-3xl md:text-4xl font-bold mb-8 text-center">Experience YBeans</h2>
+            <div className="grid-animation relative w-80 h-80 mx-auto" onClick={startAnimation}>
+              {[...Array(9)].map((_, index) => (
+                <div key={index} className={`square ${index === 4 && isAnimating ? 'falling-square' : ''}`}></div>
+              ))}
+              <div className={`coffee-bean ${isAnimating ? 'animate-coffee-bean' : ''}`}></div>
+            </div>
+            <p className="text-center mt-4">Click to see the magic!</p>
+          </div>
+        </section>
 
         <section ref={(el) => (sectionRefs.current[0] = el)} className="hero-section h-screen flex items-center justify-center bg-coffee-dark text-white relative overflow-hidden">
           <motion.div 
