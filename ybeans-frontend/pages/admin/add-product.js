@@ -16,7 +16,7 @@ const AddProductPage = () => {
     origin: '',
     roastLevel: '',
     flavorNotes: '',
-    imageUrl: null,
+    image: null,  // 改为 image
   });
 
   useEffect(() => {
@@ -37,11 +37,20 @@ const AddProductPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await addProduct(formData);
+      const productData = new FormData();
+      for (const key in formData) {
+        productData.append(key, formData[key]);
+      }
+      await addProduct(productData);
       alert('Product added successfully!');
       router.push('/admin/dashboard');
     } catch (error) {
-      alert('Failed to add product. Please try again.');
+      console.error('Error adding product:', error);
+      if (error.response) {
+        console.error('Response data:', error.response.data);
+        console.error('Response status:', error.response.status);
+      }
+      alert('Failed to add product. Please try again. Error: ' + error.message);
     }
   };
 

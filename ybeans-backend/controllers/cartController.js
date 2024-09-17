@@ -6,14 +6,23 @@ const Product = require('../models/Product');
 // @access  Private
 const getCart = async (req, res) => {
   try {
-    let cart = await Cart.findOne({ user: req.user._id }).populate('items.product');
+    let cart = await Cart.findOne({ user: req.user._id }).populate({
+      path: 'items.product',
+      select: 'name price imageUrl'
+    });
     if (!cart) {
       cart = new Cart({ user: req.user._id, items: [] });
       await cart.save();
     }
+
+    // 过滤掉无效的商品
+    cart.items = cart.items.filter(item => item.product != null);
+    await cart.save();
+
     res.json(cart);
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    console.error('Error in getCart:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
 
@@ -24,14 +33,14 @@ const addToCart = async (req, res) => {
   const { productId, quantity } = req.body;
 
   try {
-    let cart = await Cart.findOne({ user: req.user._id });
-    if (!cart) {
-      cart = new Cart({ user: req.user._id, items: [] });
-    }
-
     const product = await Product.findById(productId);
     if (!product) {
       return res.status(404).json({ message: 'Product not found' });
+    }
+
+    let cart = await Cart.findOne({ user: req.user._id });
+    if (!cart) {
+      cart = new Cart({ user: req.user._id, items: [] });
     }
 
     const cartItemIndex = cart.items.findIndex(item => item.product.toString() === productId);

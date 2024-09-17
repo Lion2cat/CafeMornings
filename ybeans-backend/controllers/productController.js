@@ -1,3 +1,5 @@
+const fs = require('fs');
+const path = require('path');
 const Product = require('../models/Product');
 
 // @desc    Fetch all products
@@ -32,15 +34,18 @@ const getProductById = async (req, res) => {
 // @route   POST /api/products
 // @access  Private/Admin
 const createProduct = async (req, res) => {
+  console.log('Received product data:', req.body);
+  console.log('Received file:', req.file);
+
   try {
     const { name, description, price, stock, category, origin, roastLevel, flavorNotes } = req.body;
-    const imageUrl = req.file ? `/images/products/${req.file.filename}` : null;
+    const imageUrl = req.file ? `/uploads/images/products/${req.file.filename}` : null;
 
     const product = new Product({
       name,
       description,
-      price,
-      stock,
+      price: Number(price),
+      stock: Number(stock),
       category,
       origin,
       roastLevel,
@@ -49,12 +54,13 @@ const createProduct = async (req, res) => {
     });
 
     const createdProduct = await product.save();
+    console.log('Product created successfully:', createdProduct);
     res.status(201).json(createdProduct);
   } catch (error) {
     console.error('Error creating product:', error);
     res.status(400).json({ message: 'Invalid product data', error: error.message });
   }
-};
+}; 
 
 // @desc    Update a product
 // @route   PUT /api/products/:id
@@ -95,6 +101,18 @@ const deleteProduct = async (req, res) => {
     const product = await Product.findById(req.params.id);
 
     if (product) {
+      // 删除图片文件
+      if (product.imageUrl) {
+        const imagePath = path.join(__dirname, '..', product.imageUrl);
+        fs.unlink(imagePath, (err) => {
+          if (err) {
+            console.error('Error deleting image file:', err);
+          } else {
+            console.log('Image file deleted successfully');
+          }
+        });
+      }
+
       await Product.deleteOne({ _id: req.params.id });
       console.log('Product deleted successfully');
       res.json({ message: 'Product removed' });

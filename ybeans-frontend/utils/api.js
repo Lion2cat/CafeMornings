@@ -93,26 +93,23 @@ export const login = async (credentials) => {
 };
 
 export async function addProduct(productData) {
-  const formData = new FormData();
-  for (const key in productData) {
-    if (key === 'image' && productData[key] instanceof File) {
-      formData.append('image', productData[key]);
-    } else {
-      formData.append(key, productData[key]);
+  try {
+    const response = await fetch(`${API_URL}/products`, {
+      method: 'POST',
+      headers: getAuthHeader(),
+      body: productData,
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('Server error:', errorData);
+      throw new Error(errorData.message || 'Failed to add product');
     }
+    return response.json();
+  } catch (error) {
+    console.error('Error in addProduct:', error);
+    throw error;
   }
-
-  const response = await fetch(`${API_URL}/products`, {
-    method: 'POST',
-    headers: getAuthHeader(),
-    body: formData,
-  });
-
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.message || 'Failed to add product');
-  }
-  return response.json();
 }
 
 export const getProducts = async () => {
@@ -203,4 +200,8 @@ export const updateUserRole = async (id, isAdmin) => {
     throw new Error('Failed to update user role');
   }
   return response.json();
+};
+
+export const getImageUrl = (imageUrl) => {
+  return `${API_URL}${imageUrl}`;
 };

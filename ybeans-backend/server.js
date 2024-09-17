@@ -25,6 +25,8 @@ app.use('/api/payment', require('./routes/paymentRoutes'));
 app.use(notFound);
 app.use(errorHandler);
 
+app.use('/images', express.static('public/images'));
+
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
